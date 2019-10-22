@@ -187,6 +187,13 @@
                 NSMutableArray *output = [NSMutableArray array];
                 
                 for (SKPaymentTransaction *item in transactions) {
+                    
+                    //Filter failed&restored transactions
+                    if (item.transactionState != SKPaymentTransactionStatePurchasing &&
+                        item.transactionState != SKPaymentTransactionStatePurchased) {
+                        continue;
+                    }
+
                     NSMutableDictionary *purchase = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                      @(item.transactionDate.timeIntervalSince1970 * 1000), @"transactionDate",
                                                      item.transactionIdentifier, @"transactionId",
