@@ -1,6 +1,8 @@
 #import "FlutterInappPurchasePlugin.h"
 #import "IAPPromotionObserver.h"
+#import <pthread.h>
 
+pthread_rwlock_t rwLock;
 @interface FlutterInappPurchasePlugin() {
     SKPaymentTransaction *currentTransaction;
     FlutterResult flutterResult;
@@ -36,6 +38,9 @@
 
 - (instancetype)init {
     self = [super init];
+    
+    pthread_rwlock_init(&rwLock, NULL);
+    
     self.fetchProducts = [[NSMutableDictionary alloc] init];
     self.requestedPayments = [[NSMutableDictionary alloc] init];
     self.products = [[NSArray alloc] init];
@@ -47,6 +52,9 @@
 }
 
 - (void)dealloc {
+    
+    pthread_rwlock_destroy(&rwLock);
+    
     [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
     [self.channel setMethodCallHandler:nil];
 }
@@ -301,10 +309,15 @@
             delTar = k;
         }
     }
+    
+    //get write lock, prevent other thread read&write
+    pthread_rwlock_wrlock(&rwLock);
     if (delTar >= 0) {
         [validProducts removeObjectAtIndex:delTar];
     }
     [validProducts addObject:aProd];
+    //relase write lock after writing completed
+    pthread_rwlock_unlock(&rwLock);
 }
 
 -(NSDictionary *)getProductObject:(SKProduct*)product{
