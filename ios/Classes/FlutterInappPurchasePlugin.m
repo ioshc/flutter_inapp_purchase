@@ -75,12 +75,16 @@ pthread_rwlock_t rwLock;
         NSString* identifier = (NSString*)call.arguments[@"sku"];
         SKProduct *product;
 
+        //get read lock, prevent other thread write
+        pthread_rwlock_rdlock(&rwLock);
         for (SKProduct *p in validProducts) {
             if([identifier isEqualToString:p.productIdentifier]) {
                 product = p;
                 break;
             }
         }
+        pthread_rwlock_unlock(&rwLock);
+
         if (product) {
             SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
             [[SKPaymentQueue defaultQueue] addPayment:payment];
@@ -101,12 +105,16 @@ pthread_rwlock_t rwLock;
 
         SKProduct *product;
         SKMutablePayment *payment;
+        //get read lock, prevent other thread write
+        pthread_rwlock_rdlock(&rwLock);
         for (SKProduct *p in validProducts) {
             if([sku isEqualToString:p.productIdentifier]) {
                 product = p;
                 break;
             }
         }
+        pthread_rwlock_unlock(&rwLock);
+
         if (product) {
             payment = [SKMutablePayment paymentWithProduct:product];
 #if __IPHONE_12_2
@@ -138,12 +146,16 @@ pthread_rwlock_t rwLock;
         long quantity = (long)call.arguments[@"quantity"];
 
         SKProduct *product;
+        //get read lock, prevent other thread write
+        pthread_rwlock_rdlock(&rwLock);
         for (SKProduct *p in validProducts) {
             if([sku isEqualToString:p.productIdentifier]) {
                 product = p;
                 break;
             }
         }
+        pthread_rwlock_unlock(&rwLock);        
+
         if (product) {
             SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
             payment.quantity = quantity;
@@ -293,9 +305,12 @@ pthread_rwlock_t rwLock;
     }
     NSMutableArray* items = [NSMutableArray array];
     
+    //get read lock, prevent other thread write
+    pthread_rwlock_rdlock(&rwLock);
     for (SKProduct* product in validProducts) {
         [items addObject:[self getProductObject:product]];
     }
+    pthread_rwlock_unlock(&rwLock);
 
     result(items);
 }
