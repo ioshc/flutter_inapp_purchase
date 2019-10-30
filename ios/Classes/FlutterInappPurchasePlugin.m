@@ -578,7 +578,7 @@ pthread_rwlock_t rwLock;
                                      @"SKPaymentTransactionStateFailed", @"debugMessage",
                                      [self standardErrorCode:(int)transaction.error.code], @"code",
                                      [self englishErrorCodeDescription:(int)transaction.error.code], @"message",
-                                     transaction.payment.productIdentifier, "productId",
+                                     transaction.payment.productIdentifier, @"productId",
                                      nil
                                      ];
                 NSString* result = [self convertDicToJsonString:err];
