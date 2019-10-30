@@ -175,25 +175,29 @@ class PurchaseResult {
   final String debugMessage;
   final String code;
   final String message;
+  final String productId;
 
   PurchaseResult({
     this.responseCode,
     this.debugMessage,
     this.code,
-    this.message
+    this.message,
+    this.productId
   });
 
   PurchaseResult.fromJSON(Map<String, dynamic> json)
       : responseCode = json['responseCode'] as int,
         debugMessage = json['debugMessage'] as String,
         code = json['code'] as String,
-        message = json['message'] as String;
+        message = json['message'] as String,
+        productId = json['productId'] as String;
 
   Map<String, dynamic> toJson() => {
     "responseCode": responseCode ?? 0,
     "debugMessage": debugMessage ?? '',
     "code": code ?? '',
     "message": message ?? '',
+    "productId": productId ?? '',
   };
 
   @override
@@ -201,7 +205,8 @@ class PurchaseResult {
     return 'responseCode: $responseCode, '
         'debugMessage: $debugMessage, '
         'code: $code, '
-        'message: $message'
+        'message: $message, '
+        'productId: $productId'
     ;
   }
 }
